@@ -18,6 +18,8 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "mapbox-gl": "^2.15.0",
+    "ngx-mapbox-gl": "^11.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
@@ -27,6 +29,7 @@
     "@angular/cli": "^18.2.1",
     "@angular/compiler-cli": "^18.2.0",
     "@types/jasmine": "~5.1.0",
+    "@types/mapbox-gl": "^3.4.0",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.10",
     "jasmine-core": "~5.2.0",
