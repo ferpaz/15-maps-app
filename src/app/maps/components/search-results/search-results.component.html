@@ -1,0 +1,25 @@
+<div class=" bg-white">
+  @if (isLoadingPlaces) {
+  <div role="alert" class="border bg-gray-200 p-2 rounded-md">
+    <div>
+      <h3 class="text-black font-bold">Loading</h3>
+      <div class="text-gray-500 text-xs">Wait a moment...</div>
+    </div>
+  </div>
+  }
+
+  @if (!isLoadingPlaces && places.length > 0) {
+  <ul class="list-group bg-gray-200 p-2 rounded-md">
+    @for (place of places; track $index) {
+      <li class="list-item">
+        <h6 class="text-black font-bold">{{ place.properties.name_preferred }}</h6>
+        <span class="text-gray-500 text-xs">{{ place.properties.full_address }}</span>
+      </li>
+      <button
+        class="btn btn-outline btn-primary btn-sm rounded-md shadow-md mt-2 mb-4"
+        (click)="flyTo(place)"
+      >Directions</button>
+    }
+  </ul>
+  }
+</div>
