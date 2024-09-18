@@ -41,6 +41,6 @@ export class MapViewComponent implements AfterViewInit {
       .setPopup(popup)
       .addTo(this.map);
 
-      this.mapService.setMap(this.map);
+    this.mapService.setMap(this.map);
   }
 }
