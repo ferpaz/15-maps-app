@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import Mapboxgl from 'mapbox-gl';
 
 import { environment } from '../environments/environment';
-import { HttpClient, HttpClientModule, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 
 Mapboxgl.accessToken = environment.mapbox.accessToken;
 
