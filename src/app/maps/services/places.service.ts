@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 
-import { PlacesApiClient } from '../api/places-api-client';
+import { DirectionsApiClient, PlacesApiClient } from '../api';
 import { Feature, SearchResponse } from '../interfaces/search-response.interface';
-import { tap } from 'rxjs';
+import { DirectionsResponse } from '../interfaces/directions-response.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,7 @@ import { tap } from 'rxjs';
 export class PlacesService {
 
   private placesApi = inject(PlacesApiClient);
+  private directionsApi = inject(DirectionsApiClient);
 
   public userLocation?: [number, number];
 
@@ -21,6 +22,8 @@ export class PlacesService {
   public places: Feature[] = [];
 
   public isLoadingPlaces: boolean = false;
+
+  public selectedPlaceId: string = '';
 
 
   constructor() {
@@ -49,9 +52,11 @@ export class PlacesService {
 
   }
 
-  public getPlacesNearby(query: string = '', limit: number = 5, language: string ='es'): void {
+  public getPlacesNearby(query: string, onSuscribe: Function, limit: number = 5, language: string ='es'): void {
     if (!query || query === '') {
       this.places = [];
+      this.isLoadingPlaces = false;
+      this.selectedPlaceId = '';
     }
 
     if (!this.isUserLocationReady) throw new Error('User location not available');
@@ -69,6 +74,31 @@ export class PlacesService {
       .subscribe((response) => {
         this.places = response.features;
         this.isLoadingPlaces = false;
+        onSuscribe();
+      });
+  }
+
+  public getDirections(destination: [number, number], onSuscribe: Function) {
+    if (!this.isUserLocationReady) throw new Error('User location not available');
+
+    const [lng, lat] = this.userLocation!;
+    const url = `/${lng},${lat};${destination[0]},${destination[1]}`;
+
+    return this.directionsApi.get<DirectionsResponse>(encodeURI(url))
+      .subscribe((response) => {
+        if (response.routes.length === 0) {
+          onSuscribe([]);
+        } else {
+          console.log(response.routes);
+
+          const shortestRouteIndex = response.routes.reduce((minIndex, route, index, routes) => {
+            return route.duration > routes[minIndex].duration ? index : minIndex;
+          }, 0);
+
+          console.log(shortestRouteIndex);
+
+          onSuscribe(response.routes[shortestRouteIndex].geometry.coordinates);
+        }
       });
   }
 }
