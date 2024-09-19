@@ -14,6 +14,9 @@ export class SearchResultsComponent {
   private placesService = inject(PlacesService);
   private mapService = inject(MapService);
 
+  public _selectedId: string = '';
+
+
   get isLoadingPlaces() {
     return this.placesService.isLoadingPlaces;
   }
@@ -22,9 +25,31 @@ export class SearchResultsComponent {
     return this.placesService.places;
   }
 
-  flyTo(place: Feature) {
-    const [lng, lat] = place.geometry.coordinates;
-    this.mapService.flyTo([lng, lat]);
+  get selectedId() {
+    return this.placesService.selectedPlaceId;
   }
 
+  flyTo(place: Feature) {
+    this.placesService.selectedPlaceId = place.id;
+    const [lng, lat] = place.geometry.coordinates;
+
+    this.mapService.flyTo([lng, lat]);
+    this.mapService.removeDirections();
+  }
+
+  getDirections(place: Feature) {
+    this.placesService.selectedPlaceId = place.id;
+    const [lng, lat] = place.geometry.coordinates;
+
+    this.mapService.removeDirections();
+
+    this.placesService.getDirections(
+      [lng, lat],
+      (coordinates: number[][]) => {
+        if (coordinates.length > 0) {
+          this.mapService.addDirections(coordinates);
+        }
+      }
+    );
+  }
 }

@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 
-import { PlacesService } from '../../services';
+import { MapService, PlacesService } from '../../services';
 import { SearchResultsComponent } from '../search-results/search-results.component';
 
 @Component({
@@ -12,8 +12,11 @@ import { SearchResultsComponent } from '../search-results/search-results.compone
 export class SearchBarComponent {
 
   private placesService = inject(PlacesService);
+  private mapService = inject(MapService);
 
   private debounceTimer?: NodeJS.Timeout;
+
+  @ViewChild('txtQuery') public txtQuery!: ElementRef;
 
   onQueryChanged(query: string = '') {
     if (this.debounceTimer) {
@@ -21,8 +24,33 @@ export class SearchBarComponent {
     }
 
     this.debounceTimer = setTimeout(() => {
-      this.placesService.getPlacesNearby(query);
+      this.mapService.removeMarkers();
+      this.placesService.getPlacesNearby(
+        query,
+        () => {
+          this.createMarkersFromPlaces();
+          this.mapService.removeDirections();
+        }
+      );
     }, 500);
+  }
 
+  private createMarkersFromPlaces() {
+    if (this.placesService.places.length > 0) {
+      this.placesService.places.forEach((place) => {
+        const [lng, lat] = place.geometry.coordinates;
+        this.mapService.addMarker(
+          [lng, lat],
+          place.properties.name,
+          place.properties.full_address,
+          'gray'
+        );
+      });
+    }
+  }
+
+  clearSearch() {
+    this.txtQuery.nativeElement.value = '';
+    this.onQueryChanged();
   }
 }

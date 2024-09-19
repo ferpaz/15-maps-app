@@ -1,8 +1,7 @@
-import { AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild, viewChild } from '@angular/core';
-import { Map, Popup, Marker } from 'mapbox-gl';
+import { AfterViewInit, Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Map } from 'mapbox-gl';
 
 import { MapService, PlacesService } from '../../services';
-import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-map-view',
@@ -14,33 +13,25 @@ import { environment } from '../../../../environments/environment';
 export class MapViewComponent implements AfterViewInit {
 
   private mapService = inject(MapService);
-
-  @ViewChild('mapDiv') mapDivElement!: ElementRef;
   private placesService = inject(PlacesService);
+
+  @ViewChild('mapDiv', { static: true }) mapDivElement!: ElementRef;
 
   map: Map | undefined;
 
   ngAfterViewInit(): void {
-    if (!this.placesService.userLocation) throw new Error('User location not available');
+    if (!this.placesService.userLocation) throw new Error('User Location not available');
+    if (!this.mapDivElement) throw new Error('Map Div Element not available');
 
-    this.map = new Map({
-      container: this.mapDivElement.nativeElement,
-      style: environment.mapbox.style,
-      center: this.placesService.userLocation,
-      zoom: 16,
-    });
+    this.mapService.createMap(
+      this.mapDivElement.nativeElement, this.placesService.userLocation
+    );
 
-    const popup = new Popup()
-      .setHTML(`
-        <h6>Aquí estoy</h6>
-        <span>Mi posición actual en el mundo</span>
-      `);
-
-    new Marker({ color: '#d00', })
-      .setLngLat(this.placesService.userLocation)
-      .setPopup(popup)
-      .addTo(this.map);
-
-    this.mapService.setMap(this.map);
+    this.mapService.addMarker(
+      this.placesService.userLocation,
+      'Aquí estoy',
+      'Mi posición actual en el mundo',
+      '#d00'
+    );
   }
 }
