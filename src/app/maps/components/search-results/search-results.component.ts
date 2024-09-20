@@ -45,7 +45,7 @@ export class SearchResultsComponent {
       (coordinates: number[][]) => {
         if (coordinates.length > 0) {
           this.placesService.removePlaces([lng, lat]);
-          this.mapService.removeMarkers();
+          this.mapService.removeMarkers([lng, lat]);
           this.mapService.addDirections(coordinates);
         }
       }

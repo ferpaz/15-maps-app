@@ -56,15 +56,19 @@ export class MapService {
     }
   }
 
-  removeMarkers() {
+  removeMarkers(exceptThis: [number, number] | null = null) {
     if (!this.isMapReady) throw new Error('Map not ready');
 
     let index = 0;
     this.markers.forEach(marker => {
-      if (index++ != 0) marker.remove();
+      if (index != 0) {
+        if (!exceptThis || marker.getLngLat().toArray().toString() != exceptThis.toString()) {
+          marker.remove();
+        }
+      }
+      index++;
     });
 
-    this.markers = [this.markers[0]];
     this.map!.flyTo({ center: this.markers[0].getLngLat() });
   }
 

@@ -89,8 +89,6 @@ export class PlacesService {
         if (response.routes.length === 0) {
           onSuscribe([]);
         } else {
-          console.log(response.routes);
-
           const shortestRouteIndex = response.routes.reduce((minIndex, route, index, routes) => {
             return route.duration > routes[minIndex].duration ? index : minIndex;
           }, 0);
@@ -105,10 +103,12 @@ export class PlacesService {
   public removePlaces(coords: [number, number]) {
     if (!this.isUserLocationReady) throw new Error('User location not available');
 
-    this.places = [];
-    // this.places = this.places.filter((place) => {
-    //   return (place.geometry.coordinates[0] !== coords[0] && place.geometry.coordinates[1] !== coords[1])
-    //          && (place.geometry.coordinates[0] !== this.userLocation![0] && place.geometry.coordinates[1] !== this.userLocation![1]);
-    // });
+    // Busca el indice donde se encuentran las coordenadas especificadas en el array de places
+    const index = this.places.findIndex((place) => {
+      return place.geometry.coordinates[0] === coords[0] && place.geometry.coordinates[1] === coords[1];
+    });
+
+    // dejar en el array places solo los lugares que no tengan las coordenadas especificadas
+    this.places = this.places.filter((place, i) => i === index);
   }
 }
