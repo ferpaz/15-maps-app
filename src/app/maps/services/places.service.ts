@@ -101,4 +101,14 @@ export class PlacesService {
         }
       });
   }
+
+  public removePlaces(coords: [number, number]) {
+    if (!this.isUserLocationReady) throw new Error('User location not available');
+
+    this.places = [];
+    // this.places = this.places.filter((place) => {
+    //   return (place.geometry.coordinates[0] !== coords[0] && place.geometry.coordinates[1] !== coords[1])
+    //          && (place.geometry.coordinates[0] !== this.userLocation![0] && place.geometry.coordinates[1] !== this.userLocation![1]);
+    // });
+  }
 }

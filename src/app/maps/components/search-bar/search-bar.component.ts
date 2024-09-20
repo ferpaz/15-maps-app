@@ -25,11 +25,12 @@ export class SearchBarComponent {
 
     this.debounceTimer = setTimeout(() => {
       this.mapService.removeMarkers();
+      this.mapService.removeDirections();
+
       this.placesService.getPlacesNearby(
         query,
         () => {
           this.createMarkersFromPlaces();
-          this.mapService.removeDirections();
         }
       );
     }, 500);

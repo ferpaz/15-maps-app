@@ -52,18 +52,8 @@ export class MapService {
     if (this.markers.length == 1) {
       this.map!.flyTo({ center: this.markers[0].getLngLat() });
   } else {
-      this.map!.fitBounds(this.getBounds(this.markers), { padding: 50 });
+      this.map!.fitBounds(this.getBounds(this.markers), { padding: 100 });
     }
-  }
-
-  private getBounds(markers: Marker[]): LngLatBounds {
-    const bounds = new LngLatBounds();
-
-    markers.forEach(marker => {
-      bounds.extend(marker.getLngLat());
-    });
-
-    return bounds;
   }
 
   removeMarkers() {
@@ -80,6 +70,11 @@ export class MapService {
 
   addDirections(coordinates: number[][]) {
     if (!this.isMapReady) throw new Error('Map not ready');
+
+    if (this.map!.getLayer('route')) {
+      this.map!.removeLayer('route');
+      this.map!.removeSource('route');
+    }
 
     this.directions = coordinates;
 
@@ -107,12 +102,13 @@ export class MapService {
       }
     });
 
-    const directionMarkers = [
-      new Marker().setLngLat([ this.directions[0][0], this.directions[0][1] ]),
-      new Marker().setLngLat([ this.directions[this.directions.length - 1][0], this.directions[this.directions.length - 1][1] ])
-    ];
+    const directionMarkers: Marker[] = [];
+    this.directions.forEach((coords, index) => {
+      const newCoord: [number, number] = [coords[0], coords[1]];
+      directionMarkers.push(new Marker().setLngLat(newCoord));
+    });
 
-    this.map!.fitBounds(this.getBounds(directionMarkers), { padding: 50 });
+    this.map!.fitBounds(this.getBounds(directionMarkers), { padding: 100 });
   }
 
   removeDirections() {
@@ -122,5 +118,15 @@ export class MapService {
       this.map!.removeLayer('route');
       this.map!.removeSource('route');
     }
+  }
+
+  private getBounds(markers: Marker[]): LngLatBounds {
+    const bounds = new LngLatBounds();
+
+    markers.forEach(marker => {
+      bounds.extend(marker.getLngLat());
+    });
+
+    return bounds;
   }
 }
